@@ -17,3 +17,10 @@ jobs:
           cache: "npm"
       - run: npm ci
       - run: npm run build
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./
+        with:
+          working-dir: src
