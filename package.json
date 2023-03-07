@@ -1,0 +1,74 @@
+{
+  "name": "actions-cfn-diff",
+  "version": "0.1.0",
+  "private": false,
+  "description": "GitHub Actions to summarize diffs of CloudFormation stack",
+  "keywords": [
+    "actions",
+    "node",
+    "cloudformation"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/taichi/actions-cfn-diff.git"
+  },
+  "license": "MIT",
+  "author": "taichi",
+  "main": "lib/main.js",
+  "scripts": {
+    "build": "npm-run-all clean --parallel lint compile",
+    "package": "ncc build --source-map --license licenses.txt",
+    "clean": "rimraf lib dist",
+    "compile": "tsc",
+    "fix": "run-s format lint:fix",
+    "format": "prettier --write .",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "test": "ava"
+  },
+  "eslintIgnore": [
+    ".eslintrc.js",
+    "dist/",
+    "lib/",
+    "node_modules/"
+  ],
+  "ava": {
+    "extensions": [
+      "ts"
+    ],
+    "require": [
+      "ts-node/register"
+    ],
+    "files": [
+      "test/**/*.test.ts"
+    ],
+    "verbose": true
+  },
+  "dependencies": {
+    "@actions/core": "1.10.0",
+    "@aws-cdk/cloudformation-diff": "2.67.0",
+    "@aws-sdk/client-cloudformation": "3.282.0",
+    "aws-cdk-lib": "2.67.0"
+  },
+  "devDependencies": {
+    "@types/node": "18.14.6",
+    "@typescript-eslint/eslint-plugin": "5.54.1",
+    "@typescript-eslint/parser": "5.54.1",
+    "@vercel/ncc": "0.36.1",
+    "ava": "5.2.0",
+    "eslint": "8.35.0",
+    "eslint-config-prettier": "8.7.0",
+    "eslint-import-resolver-typescript": "3.5.3",
+    "eslint-plugin-ava": "14.0.0",
+    "eslint-plugin-import": "2.27.5",
+    "eslint-plugin-jest": "27.2.1",
+    "js-yaml": "4.1.0",
+    "npm-check-updates": "16.7.10",
+    "npm-run-all": "4.1.5",
+    "prettier": "2.8.4",
+    "rimraf": "4.3.1",
+    "sort-package-json": "2.4.1",
+    "ts-node": "10.9.1",
+    "typescript": "4.9.5"
+  }
+}

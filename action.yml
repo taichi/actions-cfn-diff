@@ -1,0 +1,10 @@
+name: "Summarize diffs of CloudFormation"
+description: "GitHub Actions to summarize diffs of CloudFormation stack."
+author: "taichi"
+inputs:
+  working-dir:
+    required: false
+    default: "."
+runs:
+  using: "node16"
+  main: "dist/index.js"
