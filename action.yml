@@ -1,10 +1,38 @@
 name: "Summarize diffs of CloudFormation"
 description: "GitHub Actions to summarize diffs of CloudFormation stack."
 author: "taichi"
+branding:
+  icon: "upload-cloud"
+  color: "orange"
+
 inputs:
-  working-dir:
+  aws-region:
+    required: true
+    description: "AWS Region, e.g. ap-northeast-1"
+  enable-auto-detection:
     required: false
-    default: "."
+    description: "Detects template names and template files to be processed from cdk.json."
+    default: "true"
+  stack-names:
+    required: false
+    description: "Name of CloudFormation Stack to be summarize changes."
+  template-files:
+    required: false
+    description: "Path to CloudFormation template files."
+  enable-drift-detection:
+    required: false
+    description: "Checks whether your CloudFormation stacks' actual configuration differs."
+    default: "true"
+  role-to-assume:
+    required: false
+    description: >-
+      Use the provided credentials to assume an IAM role and configure the Actions
+      environment with the assumed role credentials rather than with the provided
+      credentials
+  working-directory:
+    required: false
+    description: "Working directory of where to run the process."
+
 runs:
   using: "node16"
   main: "dist/index.js"
