@@ -520,15 +520,16 @@ const renderDetails = (sum: typeof core.summary, diff: TemplateDiff) => {
     renderAnsiCodeToHtml((stream) => formatDifferences(stream, diff))
   );
 
-  sum.addBreak();
-  sum.addDetails(
-    "Security Changes",
-    renderAnsiCodeToHtml((stream) => {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore https://github.com/aws/aws-cdk/pull/24537
-      formatSecurityChanges(stream, diff);
-    })
-  );
+  const sc = renderAnsiCodeToHtml((stream) => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore https://github.com/aws/aws-cdk/pull/24537
+    formatSecurityChanges(stream, diff);
+  });
+
+  if (sc) {
+    sum.addBreak();
+    sum.addDetails("Security Changes", sc);
+  }
 };
 
 const renderDriftStatus = (
