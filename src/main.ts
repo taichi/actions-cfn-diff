@@ -329,9 +329,12 @@ const describeDriftingStatus = async (
         },
       }
     );
-  } catch {
+  } catch (error) {
+    if (error instanceof Error) {
+      core.error(error);
+    }
     core.error(`fail to describe StackDriftDetectionStatus of ${name}`);
-    return StackDriftStatus.UNKNOWN;
+    throw error;
   }
 };
 
