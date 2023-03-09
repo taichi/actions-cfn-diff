@@ -371,7 +371,7 @@ type CfnTemplate = {
 const findNameLike = (props: { [name: string]: unknown }) => {
   const names = Object.entries(props)
     .filter(([name]) => name.endsWith("Name"))
-    .map((_, value) => value.toString());
+    .map(([_, value]) => value as string);
   return 0 < names.length ? names[0] : "";
 };
 
@@ -577,9 +577,9 @@ const writeDifferenceSummaryWithDrift = async (
     [
       { data: "Diff", header: true },
       { data: "Drift", header: true },
-      { data: "Type", header: true },
       { data: "LogicalId", header: true },
       { data: "PhysicalId", header: true },
+      { data: "Type", header: true },
     ],
   ];
 
