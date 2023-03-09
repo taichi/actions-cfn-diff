@@ -31,6 +31,7 @@ import Convert = require("ansi-to-html");
 import * as yaml from "js-yaml";
 
 const region = core.getInput("aws-region");
+const urlPrefix = `https://${region}.console.aws.amazon.com/cloudformation/home?region=${region}#/stacks`;
 
 async function run(): Promise<void> {
   try {
@@ -378,9 +379,7 @@ const findNameLike = (props: { [name: string]: unknown }) => {
 const writeSummary = async (stackName: string, target: CfnTemplate) => {
   core.debug(`writeSummary ${stackName}`);
 
-  const sum = core.summary.addHeading(
-    `:zap: ${stackName} Stack Resource Summary`
-  );
+  const sum = core.summary.addHeading(`${stackName} Stack Resources`);
 
   sum.addHeading("Resource List", 2);
   const headers: SummaryTableRow[] = [
@@ -444,14 +443,10 @@ const writeDifferenceSummary = async (
 ) => {
   core.debug(`writeDifferenceSummary ${stackName} ${stackId}`);
 
-  const sum = core.summary.addHeading(
-    `:bus: ${stackName} Stack Resource Difference Summary`
-  );
-
-  const urlPrefix = `https://${region}.console.aws.amazon.com/cloudformation/home?region=${region}#/stacks`;
   const stackUrl = `${urlPrefix}/stackinfo?stackId=${encodeURI(stackId)}`;
-
-  sum.addLink(`${stackName} CloudFormation`, stackUrl);
+  const sum = core.summary.addHeading(
+    `<a href="${stackUrl}">${stackName} Stack</a> Resources`
+  );
 
   const headers: SummaryTableRow[] = [
     [
@@ -512,7 +507,6 @@ const processResources = (
 };
 
 const renderDetails = (sum: typeof core.summary, diff: TemplateDiff) => {
-  sum.addBreak();
   const rd = renderAnsiCodeToHtml((stream) => formatDifferences(stream, diff));
   sum.addDetails("Resource Difference", `<pre>${rd}</pre>`);
 
@@ -521,9 +515,7 @@ const renderDetails = (sum: typeof core.summary, diff: TemplateDiff) => {
     // @ts-ignore https://github.com/aws/aws-cdk/pull/24537
     formatSecurityChanges(stream, diff);
   });
-
   if (sc) {
-    sum.addBreak();
     sum.addDetails("Security Changes", `<pre>${sc}</pre>`);
   }
 };
@@ -555,19 +547,14 @@ const writeDifferenceSummaryWithDrift = async (
 ) => {
   core.debug(`writeDifferenceSummaryWithDrift ${stackName} ${stackId}`);
 
+  const stackUrl = `${urlPrefix}/stackinfo?stackId=${encodeURI(stackId)}`;
   const sum = core.summary.addHeading(
-    `:airplane: ${stackName} Stack Resource Difference Summary With Drift Status`
+    `<a href="${stackUrl}">${stackName} Stack</a> Resources`
   );
 
-  const urlPrefix = `https://${region}.console.aws.amazon.com/cloudformation/home?region=${region}#/stacks`;
-  const stackUrl = `${urlPrefix}/stackinfo?stackId=${encodeURI(stackId)}`;
-
-  sum.addLink(`${stackName} Stack Information`, stackUrl);
-
   if (drift === StackDriftStatus.DRIFTED) {
-    sum.addHeading(":fire: Drift Detected :fire:", 3);
     const driftUrl = `${urlPrefix}/drifts?stackId=${encodeURI(stackId)}`;
-    sum.addLink(`${stackName} Drift Status`, driftUrl);
+    sum.addHeading(`:fire: <a href="${driftUrl}">Drift Detected</a> :fire:`, 3);
   }
 
   const headers: SummaryTableRow[] = [
