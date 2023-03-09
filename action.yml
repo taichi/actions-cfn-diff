@@ -9,20 +9,23 @@ inputs:
   aws-region:
     required: true
     description: "AWS Region, e.g. ap-northeast-1"
-  enable-auto-detection:
+  cdk-outputs-directory:
     required: false
-    description: "Detects template names and template files to be processed from cdk.json."
-    default: "true"
-  stack-names:
+    description: "Name of the directory into which the cdk outputs."
+    default: "cdk.out"
+  stack-with-templates:
     required: false
-    description: "Name of CloudFormation Stack to be summarize changes."
-  template-files:
-    required: false
-    description: "Path to CloudFormation template files."
+    description: "Set one or more newline-delimited strings that pair the stack name with the template file path using =."
   enable-drift-detection:
     required: false
     description: "Checks whether your CloudFormation stacks' actual configuration differs."
     default: "true"
+  drift-maxAttempts:
+    required: false
+    default: 5
+  drift-timeout:
+    required: false
+    default: 3000
   role-to-assume:
     required: false
     description: >-
