@@ -389,9 +389,18 @@ const writeSummary = async (stackName: string, target: CfnTemplate) => {
       { data: "Type", header: true },
     ],
   ];
-  const values = Object.entries(target.Resources).map(([id, value]) => {
-    return [id, findNameLike(value.Properties), value.Type];
-  });
+  const values = Object.entries(target.Resources)
+    .sort((left, right) => {
+      const result = left[1].Type.localeCompare(right[1].Type);
+      if (result !== 0) {
+        return result;
+      }
+      return left[0].localeCompare(right[0]);
+    })
+    .filter(([_, value]) => value.Type !== "AWS::CDK::Metadata")
+    .map(([id, value]) => {
+      return [id, findNameLike(value.Properties), value.Type];
+    });
 
   if (0 < values.length) {
     sum.addTable(headers.concat(values));
