@@ -18,6 +18,7 @@
   "scripts": {
     "build": "npm-run-all clean --parallel lint compile",
     "package": "ncc build --source-map --license licenses.txt",
+    "bundle": "npm-run-all build package",
     "clean": "rimraf lib dist",
     "compile": "tsc",
     "fix": "run-s format lint:fix",
