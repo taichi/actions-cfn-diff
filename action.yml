@@ -20,12 +20,15 @@ inputs:
     required: false
     description: "Checks whether your CloudFormation stacks' actual configuration differs."
     default: "true"
+  drift-delay-milliseconds:
+    required: false
+    default: 3000
   drift-maxAttempts:
     required: false
     default: 5
-  drift-timeout:
+  drift-timeout-milliseconds:
     required: false
-    default: 3000
+    default: 300000
   role-to-assume:
     required: false
     description: >-
