@@ -317,11 +317,11 @@ const describeDriftingStatus = async (
         };
       },
       {
-        delay: 100,
+        delay: parseNumberConfig("drift-delay-milliseconds", 3 * 1000),
         factor: 2,
         maxAttempts: parseNumberConfig("drift-maxAttempts", 5),
         jitter: true,
-        timeout: parseNumberConfig("drift-timeout", 3000),
+        timeout: parseNumberConfig("drift-timeout-milliseconds", 5 * 60 * 1000),
         handleError(err: { abort: boolean }, context: AttemptContext) {
           if (err.abort) {
             context.abort();
@@ -333,8 +333,8 @@ const describeDriftingStatus = async (
     if (error instanceof Error) {
       core.error(error);
     }
-    core.error(`fail to describe StackDriftDetectionStatus of ${name}`);
-    throw error;
+    core.info(`fail to describe StackDriftDetectionStatus of ${name}`);
+    return StackDriftStatus.UNKNOWN;
   }
 };
 
@@ -385,8 +385,8 @@ const writeSummary = async (stackName: string, target: CfnTemplate) => {
   sum.addHeading("Resource List", 2);
   const headers: SummaryTableRow[] = [
     [
-      { data: "LogicalId", header: true },
-      { data: "PhysicalId", header: true },
+      { data: "Logical ID", header: true },
+      { data: "Physical ID", header: true },
       { data: "Type", header: true },
     ],
   ];
@@ -410,9 +410,7 @@ const renderAnsiCodeToHtml = (fn: (stream: PassThrough) => void): string => {
     chunks.push(Buffer.from(chunk));
   });
   fn(stream);
-  const convert = new Convert({
-    newline: true,
-  });
+  const convert = new Convert();
   return convert.toHtml(Buffer.concat(chunks).toString("utf-8"));
 };
 
@@ -458,8 +456,8 @@ const writeDifferenceSummary = async (
   const headers: SummaryTableRow[] = [
     [
       { data: "Diff", header: true },
-      { data: "LogicalId", header: true },
-      { data: "PhysicalId", header: true },
+      { data: "Logical ID", header: true },
+      { data: "Physical ID", header: true },
       { data: "Type", header: true },
     ],
   ];
@@ -515,10 +513,8 @@ const processResources = (
 
 const renderDetails = (sum: typeof core.summary, diff: TemplateDiff) => {
   sum.addBreak();
-  sum.addDetails(
-    "Resource Difference",
-    renderAnsiCodeToHtml((stream) => formatDifferences(stream, diff))
-  );
+  const rd = renderAnsiCodeToHtml((stream) => formatDifferences(stream, diff));
+  sum.addDetails("Resource Difference", `<pre>${rd}</pre>`);
 
   const sc = renderAnsiCodeToHtml((stream) => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -528,7 +524,7 @@ const renderDetails = (sum: typeof core.summary, diff: TemplateDiff) => {
 
   if (sc) {
     sum.addBreak();
-    sum.addDetails("Security Changes", sc);
+    sum.addDetails("Security Changes", `<pre>${sc}</pre>`);
   }
 };
 
@@ -578,8 +574,8 @@ const writeDifferenceSummaryWithDrift = async (
     [
       { data: "Diff", header: true },
       { data: "Drift", header: true },
-      { data: "LogicalId", header: true },
-      { data: "PhysicalId", header: true },
+      { data: "Logical ID", header: true },
+      { data: "Physical ID", header: true },
       { data: "Type", header: true },
     ],
   ];
