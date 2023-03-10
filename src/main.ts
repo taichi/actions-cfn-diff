@@ -436,9 +436,9 @@ const renderChangeImpact = (impact?: ResourceImpact) => {
     case ResourceImpact.WILL_CREATE:
       return ":sparkles: Create";
     case ResourceImpact.WILL_REPLACE:
-      return ":green_book: Replace";
+      return ":hammer_and_wrench: Replace";
     case ResourceImpact.MAY_REPLACE:
-      return ":blue_book: May Replace";
+      return ":wrench: May Replace";
     case ResourceImpact.WILL_DESTROY:
       return ":bomb: Destroy";
     case ResourceImpact.WILL_ORPHAN:
@@ -570,7 +570,7 @@ const renderDriftStatus = (
     case StackResourceDriftStatus.MODIFIED:
       return ":fire: MODIFIED";
     case StackResourceDriftStatus.NOT_CHECKED:
-      return "";
+      return ":see_no_evil: NOT_CHECKED";
     default:
       return "";
   }
@@ -614,7 +614,8 @@ const writeDifferenceSummaryWithDrift = async (
 
       if (
         impact === ResourceImpact.NO_CHANGE &&
-        drift === StackResourceDriftStatus.NOT_CHECKED
+        (drift === StackResourceDriftStatus.NOT_CHECKED ||
+          drift === StackResourceDriftStatus.IN_SYNC)
       ) {
         return;
       }
