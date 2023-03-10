@@ -372,6 +372,7 @@ type CfnTemplate = {
 const findNameLike = (props: { [name: string]: unknown }) => {
   const names = Object.entries(props)
     .filter(([name]) => name.endsWith("Name"))
+    .filter(([_, value]) => typeof value === "string")
     .map(([_, value]) => value as string);
   return 0 < names.length ? names[0] : "";
 };
@@ -395,9 +396,9 @@ const writeSummary = async (stackName: string, target: CfnTemplate) => {
       if (result !== 0) {
         return result;
       }
-      const ln = findNameLike(left[1].Properties);
-      const rn = findNameLike(right[1].Properties);
-      const nr = ln.localeCompare(rn);
+      const leftName = findNameLike(left[1].Properties);
+      const rightName = findNameLike(right[1].Properties);
+      const nr = leftName.localeCompare(rightName);
       if (nr !== 0) {
         return nr;
       }
