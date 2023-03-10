@@ -163,7 +163,7 @@ const detectTargets = async () => {
   const cdkDir = core.getInput("cdk-outputs-directory");
   const stat = await fs.promises.stat(cdkDir);
   if (stat && stat.isDirectory()) {
-    const values = detectCdkOutputs(cdkDir);
+    const values = await detectCdkOutputs(cdkDir);
     core.debug(`detected targets ${values}`);
     return values;
   }
@@ -582,13 +582,24 @@ const renderDriftStatus = (
   }
 };
 
+const detectDriftStatus = (currentResources: StackResourceSummary[]) => {
+  const res = currentResources.find((resource) => {
+    const status = resource.DriftInformation?.StackResourceDriftStatus;
+    return (
+      status === StackResourceDriftStatus.MODIFIED ||
+      status === StackResourceDriftStatus.DELETED
+    );
+  });
+  return res ? StackDriftStatus.DRIFTED : StackDriftStatus.UNKNOWN;
+};
+
 const writeDifferenceSummaryWithDrift = async (
   stackName: string,
   stackId: string,
   target: CfnTemplate,
   currentResources: StackResourceSummary[],
   diff: TemplateDiff,
-  drift: StackDriftStatus
+  stackDrift: StackDriftStatus
 ) => {
   core.debug(`writeDifferenceSummaryWithDrift ${stackName} ${stackId}`);
 
@@ -596,6 +607,11 @@ const writeDifferenceSummaryWithDrift = async (
   const sum = core.summary.addHeading(
     `<a href="${stackUrl}">${stackName} Stack</a> Resources`
   );
+
+  const drift =
+    stackDrift !== StackDriftStatus.DRIFTED
+      ? detectDriftStatus(currentResources)
+      : StackDriftStatus.UNKNOWN;
 
   if (drift === StackDriftStatus.DRIFTED) {
     const driftUrl = `${urlPrefix}/drifts?stackId=${encodeURI(stackId)}`;
