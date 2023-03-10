@@ -4,6 +4,7 @@ import * as path from "path";
 import { PassThrough } from "stream";
 import * as core from "@actions/core";
 import { SummaryTableRow } from "@actions/core/lib/summary";
+import * as github from "@actions/github";
 import {
   diffTemplate,
   formatDifferences,
@@ -290,7 +291,7 @@ const describeDriftingStatus = async (
             case StackDriftStatus.NOT_CHECKED:
               return StackDriftStatus.NOT_CHECKED;
             default:
-              core.info(
+              core.debug(
                 `unknown drift status ${response.StackDriftStatus} of ${name}`
               );
               return StackDriftStatus.UNKNOWN;
@@ -300,7 +301,7 @@ const describeDriftingStatus = async (
           response.DetectionStatus ===
           StackDriftDetectionStatus.DETECTION_FAILED
         ) {
-          core.error(`fail to detect drift status of ${name}`);
+          core.debug(`fail to detect drift status of ${name}`);
           return StackDriftStatus.UNKNOWN;
         }
 
@@ -335,9 +336,9 @@ const describeDriftingStatus = async (
     if (error instanceof Error) {
       core.error(error);
     } else {
-      core.info(JSON.stringify(error));
+      core.debug(JSON.stringify(error));
     }
-    core.info(`fail to describe StackDriftDetectionStatus of ${name}`);
+    core.debug(`fail to describe StackDriftDetectionStatus of ${name}`);
     return StackDriftStatus.UNKNOWN;
   }
 };
@@ -419,6 +420,7 @@ const writeSummary = async (stackName: string, target: CfnTemplate) => {
   }
 
   await sum.write();
+  await postComment();
 };
 
 const renderAnsiCodeToHtml = (fn: (stream: PassThrough) => void): string => {
@@ -511,6 +513,7 @@ const writeDifferenceSummary = async (
   renderDetails(sum, diff);
 
   await sum.write();
+  await postComment();
 };
 
 const processResources = (
@@ -661,6 +664,41 @@ const writeDifferenceSummaryWithDrift = async (
   renderDetails(sum, diff);
 
   await sum.write();
+  await postComment();
+};
+
+const postComment = async () => {
+  const client = github.getOctokit(core.getInput("github-token"));
+
+  const prNumber = github.context.payload.pull_request?.number;
+  if (!prNumber) {
+    return;
+  }
+
+  const repo = github.context.repo;
+
+  const commentBody = `:books: [CloudFormation Resource Summary](https://github.com/${repo.owner}/${repo.repo}/actions/runs/${github.context.runId}) is reported.`;
+
+  for await (const { data: comments } of client.paginate.iterator(
+    client.rest.issues.listComments,
+    {
+      ...repo,
+      issue_number: prNumber,
+    }
+  )) {
+    const found = comments
+      .filter((cmt) => cmt.user?.login === "github-actions[bot]")
+      .filter((cmt) => cmt.body?.includes(commentBody));
+    if (found && 0 < found.length) {
+      return;
+    }
+  }
+
+  await client.rest.issues.createComment({
+    ...github.context.repo,
+    issue_number: prNumber,
+    body: commentBody,
+  });
 };
 
 run();

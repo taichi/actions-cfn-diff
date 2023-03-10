@@ -38,6 +38,10 @@ inputs:
   working-directory:
     required: false
     description: "Working directory of where to run the process."
+  github-token:
+    required: false
+    description: "The GitHub token used to post comment."
+    default: ${{ github.token }}
 
 runs:
   using: "node16"
