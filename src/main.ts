@@ -512,7 +512,7 @@ const processResources = (
     if (tr !== 0) {
       return tr;
     }
-    const pr =
+    const pr: number =
       left.PhysicalResourceId?.localeCompare(right.PhysicalResourceId || "") ??
       0;
     if (pr !== 0) {
@@ -605,18 +605,19 @@ const writeDifferenceSummaryWithDrift = async (
       const drift = resource.DriftInformation?.StackResourceDriftStatus;
 
       if (
-        impact !== ResourceImpact.NO_CHANGE &&
-        drift &&
-        drift !== StackResourceDriftStatus.NOT_CHECKED
+        impact === ResourceImpact.NO_CHANGE &&
+        drift === StackResourceDriftStatus.NOT_CHECKED
       ) {
-        return [
-          renderChangeImpact(impact),
-          renderDriftStatus(drift),
-          target.Resources[id].Type,
-          id,
-          resource.PhysicalResourceId ?? "",
-        ];
+        return;
       }
+
+      return [
+        renderChangeImpact(impact),
+        renderDriftStatus(drift),
+        target.Resources[id].Type,
+        id,
+        resource.PhysicalResourceId ?? "",
+      ];
     }
   );
 
