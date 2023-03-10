@@ -507,6 +507,21 @@ const processResources = (
   ) => SummaryTableRow | undefined
 ): SummaryTableRow[] => {
   const values: SummaryTableRow[] = [];
+  currentResources.sort((left, right) => {
+    const tr = left.ResourceType?.localeCompare(right.ResourceType || "") ?? 0;
+    if (tr !== 0) {
+      return tr;
+    }
+    const pr =
+      left.PhysicalResourceId?.localeCompare(right.PhysicalResourceId || "") ??
+      0;
+    if (pr !== 0) {
+      return pr;
+    }
+    return (
+      left.LogicalResourceId?.localeCompare(right.LogicalResourceId || "") ?? 0
+    );
+  });
   for (const resource of currentResources) {
     if (resource.ResourceType === "AWS::CDK::Metadata") {
       continue;
