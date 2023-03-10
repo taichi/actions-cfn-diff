@@ -25,10 +25,10 @@ inputs:
     default: 3000
   drift-maxAttempts:
     required: false
-    default: 5
+    default: 7
   drift-timeout-milliseconds:
     required: false
-    default: 300000
+    default: 360000
   role-to-assume:
     required: false
     description: >-

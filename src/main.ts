@@ -308,6 +308,7 @@ const describeDriftingStatus = async (
           response.DetectionStatus ===
           StackDriftDetectionStatus.DETECTION_IN_PROGRESS
         ) {
+          core.debug(`retry describe StackDriftDetectionStatus of ${name}`);
           // continue request
           throw {
             abort: false,
@@ -320,9 +321,9 @@ const describeDriftingStatus = async (
       {
         delay: parseNumberConfig("drift-delay-milliseconds", 3 * 1000),
         factor: 2,
-        maxAttempts: parseNumberConfig("drift-maxAttempts", 5),
+        maxAttempts: parseNumberConfig("drift-maxAttempts", 7),
         jitter: true,
-        timeout: parseNumberConfig("drift-timeout-milliseconds", 5 * 60 * 1000),
+        timeout: parseNumberConfig("drift-timeout-milliseconds", 6 * 60 * 1000),
         handleError(err: { abort: boolean }, context: AttemptContext) {
           if (err.abort) {
             context.abort();
@@ -333,6 +334,8 @@ const describeDriftingStatus = async (
   } catch (error) {
     if (error instanceof Error) {
       core.error(error);
+    } else {
+      core.info(JSON.stringify(error));
     }
     core.info(`fail to describe StackDriftDetectionStatus of ${name}`);
     return StackDriftStatus.UNKNOWN;
