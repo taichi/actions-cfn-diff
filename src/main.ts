@@ -395,6 +395,12 @@ const writeSummary = async (stackName: string, target: CfnTemplate) => {
       if (result !== 0) {
         return result;
       }
+      const ln = findNameLike(left[1].Properties);
+      const rn = findNameLike(right[1].Properties);
+      const nr = ln.localeCompare(rn);
+      if (nr !== 0) {
+        return nr;
+      }
       return left[0].localeCompare(right[0]);
     })
     .filter(([_, value]) => value.Type !== "AWS::CDK::Metadata")
