@@ -384,9 +384,9 @@ const writeSummary = async (stackName: string, target: CfnTemplate) => {
   sum.addHeading("Resource List", 2);
   const headers: SummaryTableRow[] = [
     [
+      { data: "Type", header: true },
       { data: "Logical ID", header: true },
       { data: "Physical ID", header: true },
-      { data: "Type", header: true },
     ],
   ];
   const values = Object.entries(target.Resources)
@@ -405,7 +405,7 @@ const writeSummary = async (stackName: string, target: CfnTemplate) => {
     })
     .filter(([_, value]) => value.Type !== "AWS::CDK::Metadata")
     .map(([id, value]) => {
-      return [id, findNameLike(value.Properties), value.Type];
+      return [value.Type, id, findNameLike(value.Properties)];
     });
 
   if (0 < values.length) {
@@ -466,9 +466,9 @@ const writeDifferenceSummary = async (
   const headers: SummaryTableRow[] = [
     [
       { data: "Diff", header: true },
+      { data: "Type", header: true },
       { data: "Logical ID", header: true },
       { data: "Physical ID", header: true },
-      { data: "Type", header: true },
     ],
   ];
 
@@ -479,9 +479,9 @@ const writeDifferenceSummary = async (
       if (impact !== ResourceImpact.NO_CHANGE) {
         return [
           renderChangeImpact(impact),
+          target.Resources[id].Type,
           id,
           resource.PhysicalResourceId ?? "",
-          target.Resources[id].Type,
         ];
       }
     }
@@ -576,9 +576,9 @@ const writeDifferenceSummaryWithDrift = async (
     [
       { data: "Diff", header: true },
       { data: "Drift", header: true },
+      { data: "Type", header: true },
       { data: "Logical ID", header: true },
       { data: "Physical ID", header: true },
-      { data: "Type", header: true },
     ],
   ];
 
@@ -596,9 +596,9 @@ const writeDifferenceSummaryWithDrift = async (
         return [
           renderChangeImpact(impact),
           renderDriftStatus(drift),
+          target.Resources[id].Type,
           id,
           resource.PhysicalResourceId ?? "",
-          target.Resources[id].Type,
         ];
       }
     }
