@@ -468,13 +468,13 @@ const writeDifferenceSummary = async (
 
   const values = processResources(
     currentResources,
-    (id: string, _: StackResourceSummary) => {
+    (id: string, resource: StackResourceSummary) => {
       const impact = diff.resources.get(id).changeImpact;
       if (impact !== ResourceImpact.NO_CHANGE) {
         return [
           renderChangeImpact(impact),
           id,
-          findNameLike(target.Resources[id].Properties),
+          resource.PhysicalResourceId ?? "",
           target.Resources[id].Type,
         ];
       }
@@ -591,7 +591,7 @@ const writeDifferenceSummaryWithDrift = async (
           renderChangeImpact(impact),
           renderDriftStatus(drift),
           id,
-          findNameLike(target.Resources[id].Properties),
+          resource.PhysicalResourceId ?? "",
           target.Resources[id].Type,
         ];
       }
