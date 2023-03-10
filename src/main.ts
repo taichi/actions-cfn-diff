@@ -450,6 +450,14 @@ const renderChangeImpact = (impact?: ResourceImpact) => {
   }
 };
 
+const findName = (
+  props: { [name: string]: unknown },
+  sum: StackResourceSummary
+) => {
+  const name = findNameLike(props);
+  return name ?? sum.PhysicalResourceId ?? "";
+};
+
 const writeDifferenceSummary = async (
   stackName: string,
   stackId: string,
@@ -482,7 +490,7 @@ const writeDifferenceSummary = async (
           renderChangeImpact(impact),
           target.Resources[id].Type,
           id,
-          resource.PhysicalResourceId ?? "",
+          findName(target.Resources[id].Properties, resource),
         ];
       }
     }
@@ -616,7 +624,7 @@ const writeDifferenceSummaryWithDrift = async (
         renderDriftStatus(drift),
         target.Resources[id].Type,
         id,
-        resource.PhysicalResourceId ?? "",
+        findName(target.Resources[id].Properties, resource),
       ];
     }
   );
