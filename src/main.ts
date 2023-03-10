@@ -192,7 +192,7 @@ const toAccessibleTemplates = (values: string[][]) => {
       if (stat && stat.isFile()) {
         return true;
       }
-      core.debug(`cannot access to ${value} ${stat ?? JSON.stringify(stat)}`);
+      core.debug(`cannot access to ${value} ${JSON.stringify(stat ?? "{}")}`);
       return false;
     })
     .reduce((acc: { [name: string]: string }, cur: string[]) => {
@@ -455,7 +455,10 @@ const findName = (
   sum: StackResourceSummary
 ) => {
   const name = findNameLike(props);
-  return name ?? sum.PhysicalResourceId ?? "";
+  if (name) {
+    return name;
+  }
+  return sum.PhysicalResourceId ?? "";
 };
 
 const writeDifferenceSummary = async (
