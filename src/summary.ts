@@ -57,7 +57,20 @@ export const writeDifferenceSummary = async (
 ) => {
   core.debug(`writeDifferenceSummary ${stackName} ${stackId}`);
 
+  core.debug(
+    "current=> " +
+      Object.keys(current.Resources)
+        .sort((a, b) => a.localeCompare(b))
+        .join(" ")
+  );
+  core.debug(
+    "target=> " +
+      Object.keys(target.Resources)
+        .sort((a, b) => a.localeCompare(b))
+        .join(" ")
+  );
   const diff = await diffTemplate(current, target);
+  core.debug(`diff=> ${diff.resources.differenceCount}`);
 
   const stackUrl = `${urlPrefix}/stackinfo?stackId=${encodeURI(stackId)}`;
   const sum = core.summary.addHeading(
@@ -109,7 +122,20 @@ export const writeDifferenceSummaryWithDrift = async (
 ) => {
   core.debug(`writeDifferenceSummaryWithDrift ${stackName} ${stackId}`);
 
+  core.debug(
+    "current=> " +
+      Object.keys(current.Resources)
+        .sort((a, b) => a.localeCompare(b))
+        .join(" ")
+  );
+  core.debug(
+    "target=> " +
+      Object.keys(target.Resources)
+        .sort((a, b) => a.localeCompare(b))
+        .join(" ")
+  );
   const diff = await diffTemplate(current, target);
+  core.debug(`diff=> ${JSON.stringify(diff.resources)}`);
 
   const stackUrl = `${urlPrefix}/stackinfo?stackId=${encodeURI(stackId)}`;
   const sum = core.summary.addHeading(
@@ -294,6 +320,7 @@ const processResources = (
     }
     const id = resource.LogicalResourceId;
     if (id) {
+      core.debug(`LogicalResourceId => ${id}`);
       const row = fn(id, resource);
       if (row) {
         values.push(row);

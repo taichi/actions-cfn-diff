@@ -139,7 +139,7 @@ export const detectTargets = async () => {
   const stat = await fs.promises.stat(cdkDir);
   if (stat && stat.isDirectory()) {
     const values = await detectCdkOutputs(cdkDir);
-    core.debug(`detected targets ${values}`);
+    core.debug(`detected targets ${JSON.stringify(values)}`);
     return values;
   }
 
