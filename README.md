@@ -16,9 +16,10 @@ The IAM policy required by this action is as follows
         {
             "Effect": "Allow",
             "Action": [
-                "cloudformation:DescribeStackDriftDetectionStatus",
                 "cloudformation:ListStacks",
                 "cloudformation:DetectStackDrift",
+                "cloudformation:DetectStackResourceDrift",
+                "cloudformation:DescribeStackDriftDetectionStatus",
                 "cloudformation:GetTemplate",
                 "cloudformation:ListStackResources"
             ],
@@ -58,10 +59,24 @@ jobs:
         run: npm install -g aws-cdk
       - name: Make Cloudformation Templates
         run: cdk synth
-      - uses: taichi/actions-cfn-diff@main
+      - uses: taichi/actions-cfn-diff@v1
         with:
           aws-region: ap-northeast-1
 ```
 
 See [action.yml](action.yml) for the full documentation for this action's inputs
 and outputs.
+
+## Report Examples
+
+### [Before deploy](https://github.com/taichi/actions-cfn-diff-example/actions/runs/4392834414)
+
+![resource_list](./docs/simple_resource_list.png)
+
+### [Resource update summary](https://github.com/taichi/actions-cfn-diff-example/actions/runs/4394981752)
+
+![update summary](./docs/update_summary.png)
+
+### [Resource update summary with drift](https://github.com/taichi/actions-cfn-diff-example/actions/runs/4395427399)
+
+![update summary with drift](./docs/drift_detection.png)
