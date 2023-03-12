@@ -80,3 +80,8 @@ and outputs.
 ### [Resource update summary with drift](https://github.com/taichi/actions-cfn-diff-example/actions/runs/4395427399)
 
 ![update summary with drift](./docs/drift_detection.png)
+
+## Related Tools
+
+- [CDK diff commenter Action](https://github.com/tsuba3/cdk_plan_action)
+- [cdk-notifier](https://github.com/karlderkaefer/cdk-notifier)
