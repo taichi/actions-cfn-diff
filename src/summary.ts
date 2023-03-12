@@ -199,7 +199,7 @@ export const writeDifferenceSummaryWithDrift = async (
     });
     sum.addTable(headers.concat(values));
   } else {
-    sum.addHeading("There no changes.", 3);
+    sum.addHeading("There are no changes.", 3);
   }
 
   renderDetails(sum, diff);
@@ -286,7 +286,9 @@ const renderAnsiCodeToHtml = (fn: (stream: PassThrough) => void): string => {
 
 const renderDetails = (sum: typeof core.summary, diff: TemplateDiff) => {
   const rd = renderAnsiCodeToHtml((stream) => formatDifferences(stream, diff));
-  sum.addDetails("Resource Difference", `<pre>${rd}</pre>`);
+  if (rd) {
+    sum.addDetails("Resource Difference", `<pre>${rd}</pre>`);
+  }
 
   const sc = renderAnsiCodeToHtml((stream) => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
