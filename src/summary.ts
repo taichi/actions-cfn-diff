@@ -36,7 +36,6 @@ export const writeSummary = async (stackName: string, target: CfnTemplate) => {
   ];
   const values = Object.entries(target.Resources)
     .sort(resourceComparator)
-    .filter(([_, value]) => value.Type !== "AWS::CDK::Metadata")
     .map(([id, value]) => [value.Type, id, findNameLike(value.Properties, "")]);
 
   if (0 < values.length) {
@@ -88,9 +87,6 @@ export const writeDifferenceSummary = async (
 
   const values: string[][] = [];
   diff.resources.forEachDifference((id, change) => {
-    if (change.resourceType === "AWS::CDK::Metadata") {
-      return;
-    }
     const physicalId =
       currentResources.find((r) => r.LogicalResourceId == id)
         ?.PhysicalResourceId ?? "";
@@ -104,7 +100,7 @@ export const writeDifferenceSummary = async (
 
   if (0 < values.length) {
     values.sort((left, right) => {
-      const tr = left[1].localeCompare(right[1]);
+      const tr: number = left[1].localeCompare(right[1]);
       if (tr !== 0) {
         return tr;
       }
@@ -171,9 +167,6 @@ export const writeDifferenceSummaryWithDrift = async (
 
   const values: string[][] = [];
   diff.resources.forEachDifference((id, change) => {
-    if (change.resourceType === "AWS::CDK::Metadata") {
-      return;
-    }
     const resource = currentResources.find((r) => r.LogicalResourceId == id);
     const physicalId = resource?.PhysicalResourceId ?? "";
     const drift = resource?.DriftInformation?.StackResourceDriftStatus;
