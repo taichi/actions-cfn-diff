@@ -28,9 +28,18 @@ export const postComment = async () => {
     }
   }
 
-  await client.rest.issues.createComment({
-    ...github.context.repo,
-    issue_number: prNumber,
-    body: commentBody,
-  });
+  try {
+    await client.rest.issues.createComment({
+      ...github.context.repo,
+      issue_number: prNumber,
+      body: commentBody,
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      core.warning(error);
+    } else {
+      core.warning(JSON.stringify(error));
+    }
+    core.warning("set permissions of pull-requests to write.");
+  }
 };
