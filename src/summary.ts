@@ -88,6 +88,9 @@ export const writeDifferenceSummary = async (
 
   const values: string[][] = [];
   diff.resources.forEachDifference((id, change) => {
+    if (change.resourceType === "AWS::CDK::Metadata") {
+      return;
+    }
     const physicalId =
       currentResources.find((r) => r.LogicalResourceId == id)
         ?.PhysicalResourceId ?? "";
@@ -168,6 +171,9 @@ export const writeDifferenceSummaryWithDrift = async (
 
   const values: string[][] = [];
   diff.resources.forEachDifference((id, change) => {
+    if (change.resourceType === "AWS::CDK::Metadata") {
+      return;
+    }
     const resource = currentResources.find((r) => r.LogicalResourceId == id);
     const physicalId = resource?.PhysicalResourceId ?? "";
     const drift = resource?.DriftInformation?.StackResourceDriftStatus;
