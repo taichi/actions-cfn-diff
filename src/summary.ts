@@ -37,7 +37,7 @@ export const writeSummary = async (stackName: string, target: CfnTemplate) => {
   const values = Object.entries(target.Resources)
     .sort(resourceComparator)
     .filter(([_, value]) => value.Type !== "AWS::CDK::Metadata")
-    .map(([id, value]) => [value.Type, id, findNameLike(value.Properties)]);
+    .map(([id, value]) => [value.Type, id, findNameLike(value.Properties, "")]);
 
   if (0 < values.length) {
     sum.addTable(headers.concat(values));
@@ -86,22 +86,31 @@ export const writeDifferenceSummary = async (
     ],
   ];
 
-  const values = processResources(
-    currentResources,
-    (id: string, resource: StackResourceSummary) => {
-      const impact = diff.resources.get(id).changeImpact;
-      if (impact !== ResourceImpact.NO_CHANGE) {
-        return [
-          renderChangeImpact(impact),
-          target.Resources[id].Type,
-          id,
-          findName(target.Resources[id].Properties, resource),
-        ];
-      }
-    }
-  );
+  const values: string[][] = [];
+  diff.resources.forEachDifference((id, change) => {
+    const physicalId =
+      currentResources.find((r) => r.LogicalResourceId == id)
+        ?.PhysicalResourceId ?? "";
+    values.push([
+      renderChangeImpact(change.changeImpact),
+      change.resourceType,
+      id,
+      findNameLike(change.newProperties ?? {}, physicalId),
+    ]);
+  });
 
   if (0 < values.length) {
+    values.sort((left, right) => {
+      const tr = left[1].localeCompare(right[1]);
+      if (tr !== 0) {
+        return tr;
+      }
+      const pr = left[3].localeCompare(right[3]);
+      if (pr !== 0) {
+        return pr;
+      }
+      return left[2].localeCompare(right[2]);
+    });
     sum.addTable(headers.concat(values));
   } else {
     sum.addHeading("There are no changes.", 3);
@@ -157,31 +166,32 @@ export const writeDifferenceSummaryWithDrift = async (
     ],
   ];
 
-  const values = processResources(
-    currentResources,
-    (id: string, resource: StackResourceSummary) => {
-      const impact = diff.resources.get(id).changeImpact;
-      const drift = resource.DriftInformation?.StackResourceDriftStatus;
-
-      if (
-        impact === ResourceImpact.NO_CHANGE &&
-        (drift === StackResourceDriftStatus.NOT_CHECKED ||
-          drift === StackResourceDriftStatus.IN_SYNC)
-      ) {
-        return;
-      }
-
-      return [
-        renderChangeImpact(impact),
-        renderDriftStatus(drift),
-        target.Resources[id].Type,
-        id,
-        findName(target.Resources[id].Properties, resource),
-      ];
-    }
-  );
+  const values: string[][] = [];
+  diff.resources.forEachDifference((id, change) => {
+    const resource = currentResources.find((r) => r.LogicalResourceId == id);
+    const physicalId = resource?.PhysicalResourceId ?? "";
+    const drift = resource?.DriftInformation?.StackResourceDriftStatus;
+    values.push([
+      renderChangeImpact(change.changeImpact),
+      renderDriftStatus(drift),
+      change.resourceType,
+      id,
+      findNameLike(change.newProperties ?? {}, physicalId),
+    ]);
+  });
 
   if (0 < values.length) {
+    values.sort((left, right) => {
+      const tr = left[2].localeCompare(right[2]);
+      if (tr !== 0) {
+        return tr;
+      }
+      const pr = left[4].localeCompare(right[4]);
+      if (pr !== 0) {
+        return pr;
+      }
+      return left[3].localeCompare(right[3]);
+    });
     sum.addTable(headers.concat(values));
   } else {
     sum.addHeading("There no changes.", 3);
@@ -192,23 +202,15 @@ export const writeDifferenceSummaryWithDrift = async (
   await postContents(sum);
 };
 
-const findNameLike = (props: { [name: string]: unknown }) => {
+const findNameLike = (
+  props: { [name: string]: unknown },
+  candidate: string
+) => {
   const names = Object.entries(props)
     .filter(([name]) => name.endsWith("Name"))
     .filter(([_, value]) => typeof value === "string")
     .map(([_, value]) => value as string);
-  return 0 < names.length ? names[0] : "";
-};
-
-const findName = (
-  props: { [name: string]: unknown },
-  sum: StackResourceSummary
-) => {
-  const name = findNameLike(props);
-  if (name) {
-    return name;
-  }
-  return sum.PhysicalResourceId ?? "";
+  return 0 < names.length ? names[0] : candidate;
 };
 
 const resourceComparator = (
@@ -219,8 +221,8 @@ const resourceComparator = (
   if (result !== 0) {
     return result;
   }
-  const leftName = findNameLike(left[1].Properties);
-  const rightName = findNameLike(right[1].Properties);
+  const leftName = findNameLike(left[1].Properties, "");
+  const rightName = findNameLike(right[1].Properties, "");
   const nr = leftName.localeCompare(rightName);
   if (nr !== 0) {
     return nr;
@@ -289,45 +291,6 @@ const renderDetails = (sum: typeof core.summary, diff: TemplateDiff) => {
   if (sc) {
     sum.addDetails("Security Changes", `<pre>${sc}</pre>`);
   }
-};
-
-const processResources = (
-  currentResources: StackResourceSummary[],
-  fn: (
-    id: string,
-    resource: StackResourceSummary
-  ) => SummaryTableRow | undefined
-): SummaryTableRow[] => {
-  const values: SummaryTableRow[] = [];
-  currentResources.sort((left, right) => {
-    const tr = left.ResourceType?.localeCompare(right.ResourceType || "") ?? 0;
-    if (tr !== 0) {
-      return tr;
-    }
-    const pr: number =
-      left.PhysicalResourceId?.localeCompare(right.PhysicalResourceId || "") ??
-      0;
-    if (pr !== 0) {
-      return pr;
-    }
-    return (
-      left.LogicalResourceId?.localeCompare(right.LogicalResourceId || "") ?? 0
-    );
-  });
-  for (const resource of currentResources) {
-    if (resource.ResourceType === "AWS::CDK::Metadata") {
-      continue;
-    }
-    const id = resource.LogicalResourceId;
-    if (id) {
-      core.debug(`LogicalResourceId => ${id}`);
-      const row = fn(id, resource);
-      if (row) {
-        values.push(row);
-      }
-    }
-  }
-  return values;
 };
 
 const postContents = async (sum: typeof core.summary) => {
