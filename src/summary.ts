@@ -143,16 +143,22 @@ export const writeDifferenceSummaryWithDrift = async (
         .join(" ")
   );
   const diff = await diffTemplate(current, target);
-  core.debug(`diff=> ${JSON.stringify(diff.resources)}`);
+  core.debug(`diff=> ${JSON.stringify(diff.resources.differenceCount)}`);
 
   const stackUrl = `${urlPrefix}/stackinfo?stackId=${encodeURI(stackId)}`;
   const sum = core.summary.addHeading(
     `:books: <a href="${stackUrl}">${stackName} Stack</a> Resources`
   );
 
-  if (drift === StackDriftStatus.DRIFTED) {
+  if (
+    0 < diff.resources.differenceCount &&
+    drift === StackDriftStatus.DRIFTED
+  ) {
     const driftUrl = `${urlPrefix}/drifts?stackId=${encodeURI(stackId)}`;
-    sum.addHeading(`:fire: <a href="${driftUrl}">Drift Detected</a> :fire:`, 3);
+    sum.addHeading(
+      `:fire: <a href="${driftUrl}">Drifted Resource Updated</a> :fire:`,
+      3
+    );
   }
 
   const headers: SummaryTableRow[] = [
