@@ -293,13 +293,16 @@ const renderAnsiCodeToText = (fn: (stream: PassThrough) => void): string => {
     chunks.push(Buffer.from(chunk));
   });
   fn(stream);
-  return stripAnsi(Buffer.concat(chunks).toString("utf-8")).replace("~", "\\~");
+  return stripAnsi(Buffer.concat(chunks).toString("utf-8"));
 };
 
 const renderDetails = (sum: typeof core.summary, diff: TemplateDiff) => {
   const rd = renderAnsiCodeToText((stream) => formatDifferences(stream, diff));
   if (rd) {
-    sum.addDetails("Resource Difference", `<pre>${rd}</pre>`);
+    const needReplace =
+      diff.iamChanges.hasChanges || diff.securityGroupChanges.hasChanges;
+    const text = needReplace ? rd.replace(/~/g, "\\~") : rd;
+    sum.addDetails("Resource Difference", `<pre>${text}</pre>`);
   }
 
   const sc = renderAnsiCodeToText((stream) => {
