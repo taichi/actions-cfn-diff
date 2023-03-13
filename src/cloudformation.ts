@@ -40,9 +40,9 @@ export const processCloudFormation = async () => {
   const currentStacks = stacks.map((value) => value.StackName || "");
 
   const autoDrift = core.getBooleanInput("enable-drift-detection");
-  const driftStatus = autoDrift
-    ? await detectStackDriftStatus(client, currentStacks)
-    : {};
+  if (autoDrift) {
+    await detectStackDriftStatus(client, currentStacks);
+  }
 
   for (const [name, filepath] of Object.entries(targets)) {
     const target = await parseTemplate(filepath);
@@ -54,15 +54,12 @@ export const processCloudFormation = async () => {
         stacks.find((stack) => stack.StackName === name)?.StackId ?? "";
 
       if (autoDrift) {
-        const drift = detectDriftStatus(driftStatus[name], resources);
-
         await writeDifferenceSummaryWithDrift(
           name,
           stackId,
           current,
           target,
-          resources,
-          drift
+          resources
         );
       } else {
         await writeDifferenceSummary(name, stackId, current, target, resources);

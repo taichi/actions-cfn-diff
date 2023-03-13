@@ -9,7 +9,6 @@ import {
   TemplateDiff,
 } from "@aws-cdk/cloudformation-diff";
 import {
-  StackDriftStatus,
   StackResourceDriftStatus,
   StackResourceSummary,
 } from "@aws-sdk/client-cloudformation";
@@ -125,8 +124,7 @@ export const writeDifferenceSummaryWithDrift = async (
   stackId: string,
   current: CfnTemplate,
   target: CfnTemplate,
-  currentResources: StackResourceSummary[],
-  drift: StackDriftStatus
+  currentResources: StackResourceSummary[]
 ) => {
   core.debug(`writeDifferenceSummaryWithDrift ${stackName} ${stackId}`);
 
@@ -150,10 +148,7 @@ export const writeDifferenceSummaryWithDrift = async (
     `:books: <a href="${stackUrl}">${stackName} Stack</a> Resources`
   );
 
-  if (
-    0 < diff.resources.differenceCount &&
-    drift === StackDriftStatus.DRIFTED
-  ) {
+  if (findDriftedChanges(diff, currentResources)) {
     const driftUrl = `${urlPrefix}/drifts?stackId=${encodeURI(stackId)}`;
     sum.addHeading(
       `:fire: <a href="${driftUrl}">Drifted Resource Updated</a> :fire:`,
@@ -233,6 +228,24 @@ const resourceComparator = (
     return nr;
   }
   return left[0].localeCompare(right[0]);
+};
+
+const findDriftedChanges = (
+  diff: TemplateDiff,
+  currentResources: StackResourceSummary[]
+) => {
+  const found = [];
+  diff.resources.forEachDifference((id) => {
+    const resource = currentResources.find((r) => r.LogicalResourceId == id);
+    const status = resource?.DriftInformation?.StackResourceDriftStatus;
+    if (
+      status !== StackResourceDriftStatus.IN_SYNC &&
+      status !== StackResourceDriftStatus.NOT_CHECKED
+    ) {
+      found.push(resource);
+    }
+  });
+  return 0 < found.length;
 };
 
 const renderChangeImpact = (impact?: ResourceImpact) => {
