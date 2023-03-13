@@ -286,23 +286,23 @@ const renderDriftStatus = (
   }
 };
 
-const renderAnsiCodeToHtml = (fn: (stream: PassThrough) => void): string => {
+const renderAnsiCodeToText = (fn: (stream: PassThrough) => void): string => {
   const stream = new PassThrough();
   const chunks: Buffer[] = [];
   stream.on("data", (chunk) => {
     chunks.push(Buffer.from(chunk));
   });
   fn(stream);
-  return stripAnsi(Buffer.concat(chunks).toString("utf-8"));
+  return stripAnsi(Buffer.concat(chunks).toString("utf-8")).replace("~", "\\~");
 };
 
 const renderDetails = (sum: typeof core.summary, diff: TemplateDiff) => {
-  const rd = renderAnsiCodeToHtml((stream) => formatDifferences(stream, diff));
+  const rd = renderAnsiCodeToText((stream) => formatDifferences(stream, diff));
   if (rd) {
     sum.addDetails("Resource Difference", `<pre>${rd}</pre>`);
   }
 
-  const sc = renderAnsiCodeToHtml((stream) => {
+  const sc = renderAnsiCodeToText((stream) => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore https://github.com/aws/aws-cdk/pull/24537
     formatSecurityChanges(stream, diff);
