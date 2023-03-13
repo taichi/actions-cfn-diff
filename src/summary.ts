@@ -12,7 +12,7 @@ import {
   StackResourceDriftStatus,
   StackResourceSummary,
 } from "@aws-sdk/client-cloudformation";
-import Convert = require("ansi-to-html");
+import stripAnsi from "strip-ansi";
 
 import { CfnTemplate, CfnResource } from "./cloudformation";
 import { postComment } from "./comment";
@@ -293,8 +293,7 @@ const renderAnsiCodeToHtml = (fn: (stream: PassThrough) => void): string => {
     chunks.push(Buffer.from(chunk));
   });
   fn(stream);
-  const convert = new Convert();
-  return convert.toHtml(Buffer.concat(chunks).toString("utf-8"));
+  return stripAnsi(Buffer.concat(chunks).toString("utf-8"));
 };
 
 const renderDetails = (sum: typeof core.summary, diff: TemplateDiff) => {

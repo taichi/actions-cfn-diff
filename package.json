@@ -51,9 +51,9 @@
     "@aws-cdk/cloudformation-diff": "2.68.0",
     "@aws-sdk/client-cloudformation": "3.288.0",
     "@lifeomic/attempt": "3.0.3",
-    "ansi-to-html": "0.7.2",
     "aws-cdk-lib": "2.68.0",
-    "js-yaml": "4.1.0"
+    "js-yaml": "4.1.0",
+    "strip-ansi": "7.0.1"
   },
   "devDependencies": {
     "@types/js-yaml": "4.0.5",
