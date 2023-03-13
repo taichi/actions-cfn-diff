@@ -13,22 +13,22 @@ export const postComment = async () => {
 
   const commentBody = `:books: [CloudFormation Resource Summary](https://github.com/${repo.owner}/${repo.repo}/actions/runs/${github.context.runId}) is reported.`;
 
-  for await (const { data: comments } of client.paginate.iterator(
-    client.rest.issues.listComments,
-    {
-      ...repo,
-      issue_number: prNumber,
-    }
-  )) {
-    const found = comments
-      .filter((cmt) => cmt.user?.login === "github-actions[bot]")
-      .filter((cmt) => cmt.body?.includes(commentBody));
-    if (found && 0 < found.length) {
-      return;
-    }
-  }
-
   try {
+    for await (const { data: comments } of client.paginate.iterator(
+      client.rest.issues.listComments,
+      {
+        ...repo,
+        issue_number: prNumber,
+      }
+    )) {
+      const found = comments
+        .filter((cmt) => cmt.user?.login === "github-actions[bot]")
+        .filter((cmt) => cmt.body?.includes(commentBody));
+      if (found && 0 < found.length) {
+        return;
+      }
+    }
+
     await client.rest.issues.createComment({
       ...github.context.repo,
       issue_number: prNumber,
