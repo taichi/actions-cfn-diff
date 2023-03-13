@@ -11,8 +11,6 @@ import {
   ListStacksCommand,
   StackDriftDetectionStatus,
   StackDriftStatus,
-  StackResourceDriftStatus,
-  StackResourceSummary,
   StackStatus,
   StackSummary,
 } from "@aws-sdk/client-cloudformation";
@@ -344,21 +342,4 @@ export const parseTemplate = async (filepath: string): Promise<CfnTemplate> => {
   } else {
     throw new Error(`Unsupported file type ${filepath}`);
   }
-};
-
-export const detectDriftStatus = (
-  stackStatus: StackDriftStatus,
-  currentResources: StackResourceSummary[]
-) => {
-  if (stackStatus === StackDriftStatus.DRIFTED) {
-    return stackStatus;
-  }
-  const res = currentResources.find((resource) => {
-    const status = resource.DriftInformation?.StackResourceDriftStatus;
-    return (
-      status === StackResourceDriftStatus.MODIFIED ||
-      status === StackResourceDriftStatus.DELETED
-    );
-  });
-  return res ? StackDriftStatus.DRIFTED : StackDriftStatus.UNKNOWN;
 };
