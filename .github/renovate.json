@@ -6,6 +6,7 @@
     ":prConcurrentLimit10",
     ":timezone(Asia/Tokyo)"
   ],
+  "ignoreTests": true,
   "platformAutomerge": true,
   "packageRules": [
     {
