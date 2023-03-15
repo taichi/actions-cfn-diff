@@ -1,7 +1,7 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    ":ignoreModulesAndTests",
+    "config:base",
     ":label(renovate)",
     ":prConcurrentLimit10",
     ":timezone(Asia/Tokyo)"
