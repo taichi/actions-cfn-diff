@@ -49,7 +49,7 @@
     "@actions/core": "1.10.0",
     "@actions/github": "5.1.1",
     "@aws-cdk/cloudformation-diff": "2.68.0",
-    "@aws-sdk/client-cloudformation": "3.288.0",
+    "@aws-sdk/client-cloudformation": "3.290.0",
     "@lifeomic/attempt": "3.0.3",
     "aws-cdk-lib": "2.68.0",
     "js-yaml": "4.1.0",
