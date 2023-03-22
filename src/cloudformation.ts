@@ -37,11 +37,11 @@ export const processCloudFormation = async () => {
 
   const currentStacks = stacks.map((value) => value.StackName || "");
 
-  const autoDrift = core.getBooleanInput("enable-drift-detection");
-  if (autoDrift) {
+  if (core.getBooleanInput("force-drift-detection")) {
     await detectStackDriftStatus(client, currentStacks);
   }
 
+  const autoDrift = core.getBooleanInput("enable-drift-detection");
   for (const [name, filepath] of Object.entries(targets)) {
     const target = await parseTemplate(filepath);
     if (currentStacks.includes(name)) {

@@ -16,6 +16,10 @@ inputs:
   stack-with-templates:
     required: false
     description: "Set one or more newline-delimited strings that pair the stack name with the template file path using =."
+  force-drift-detection:
+    required: false
+    description: "Request forced detection of drift for the stack"
+    default: "false"
   enable-drift-detection:
     required: false
     description: "Checks whether your CloudFormation stacks' actual configuration differs."
