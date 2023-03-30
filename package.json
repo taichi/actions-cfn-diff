@@ -74,6 +74,6 @@
     "rimraf": "4.4.1",
     "sort-package-json": "2.4.1",
     "ts-node": "10.9.1",
-    "typescript": "5.0.2"
+    "typescript": "5.0.3"
   }
 }
