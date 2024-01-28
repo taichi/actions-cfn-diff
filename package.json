@@ -69,7 +69,7 @@
     "eslint-plugin-import": "2.29.1",
     "eslint-plugin-jest": "27.6.3",
     "npm-check-updates": "16.14.14",
-    "npm-run-all2": "5.0.0",
+    "npm-run-all2": "5.0.2",
     "prettier": "3.2.4",
     "rimraf": "5.0.5",
     "sort-package-json": "2.6.0",
