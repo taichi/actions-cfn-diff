@@ -4,7 +4,7 @@ This GitHub Actions outputs a Job Summary listing the resources included in the 
 
 ## Precondition
 
-- use [aws-actions/configure-aws-credentials@v2](https://github.com/aws-actions/configure-aws-credentials)
+- use [aws-actions/configure-aws-credentials@v4](https://github.com/aws-actions/configure-aws-credentials)
 - setup IAM Role for describe Cloudformation stacks
   - If you use the CDK lookup role, there is no need to create a new role for actions-cfn-diff. see [Assume role example](#assume-role-example)
 
@@ -47,10 +47,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 14
+          node-version: 20
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -90,10 +90,10 @@ jobs:
         with:
           aws-region: ap-northeast-1
           role-to-assume: arn:aws:iam::000000000000:role/cdk-deploy-from-github
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 16
+          node-version: 20
           cache: "npm"
       - run: npm ci
       - run: npm run build
