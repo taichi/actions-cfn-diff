@@ -57,7 +57,7 @@
   },
   "devDependencies": {
     "@types/js-yaml": "4.0.9",
-    "@types/node": "20.14.6",
+    "@types/node": "20.14.7",
     "@typescript-eslint/eslint-plugin": "7.13.1",
     "@typescript-eslint/parser": "7.13.1",
     "@vercel/ncc": "0.38.1",
@@ -74,6 +74,6 @@
     "rimraf": "5.0.7",
     "sort-package-json": "2.10.0",
     "ts-node": "10.9.2",
-    "typescript": "5.4.5"
+    "typescript": "5.5.2"
   }
 }
