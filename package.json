@@ -57,7 +57,7 @@
   },
   "devDependencies": {
     "@types/js-yaml": "4.0.9",
-    "@types/node": "20.14.11",
+    "@types/node": "20.14.12",
     "@typescript-eslint/eslint-plugin": "7.17.0",
     "@typescript-eslint/parser": "7.17.0",
     "@vercel/ncc": "0.38.1",
@@ -71,7 +71,7 @@
     "npm-check-updates": "16.14.20",
     "npm-run-all2": "6.2.2",
     "prettier": "3.3.3",
-    "rimraf": "6.0.1",
+    "rimraf": "5.0.9",
     "sort-package-json": "2.10.0",
     "ts-node": "10.9.2",
     "typescript": "5.5.4"
