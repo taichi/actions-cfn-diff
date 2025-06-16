@@ -58,8 +58,8 @@
   "devDependencies": {
     "@types/js-yaml": "4.0.9",
     "@types/node": "22.15.32",
-    "@typescript-eslint/eslint-plugin": "8.34.0",
-    "@typescript-eslint/parser": "8.34.0",
+    "@typescript-eslint/eslint-plugin": "8.34.1",
+    "@typescript-eslint/parser": "8.34.1",
     "@vercel/ncc": "0.38.3",
     "ava": "6.4.0",
     "eslint": "9.29.0",
