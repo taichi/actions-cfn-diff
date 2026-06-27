@@ -52,7 +52,7 @@
     "@aws-sdk/client-cloudformation": "3.1072.0",
     "@lifeomic/attempt": "3.0.3",
     "aws-cdk-lib": "2.93.0",
-    "js-yaml": "4.1.0",
+    "js-yaml": "4.3.0",
     "strip-ansi": "7.1.0"
   },
   "devDependencies": {
